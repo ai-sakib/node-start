@@ -10,7 +10,13 @@ const MAIN_ROUTE = 'admin'
 
 var products = []
 router.get(`/${ADD_PRODUCT_ROUTE}`, (req, res, next) => {
-    res.sendFile(path.join(rootDir, 'views', 'add-product.html'))
+    res.render('add-product', {
+        pageTitle: 'Add Product',
+        path: `/${MAIN_ROUTE}/${ADD_PRODUCT_ROUTE}`,
+        formsCSS: true,
+        productCSS: true,
+        activeAddProduct: true,
+    })
 })
 
 router.post(`/${ADD_PRODUCT_ROUTE}`, (req, res) => {
