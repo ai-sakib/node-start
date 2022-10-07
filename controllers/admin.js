@@ -13,16 +13,17 @@ exports.getEditProduct = (req, res, next) => {
     if (!editMode) {
         return res.redirect('/')
     }
-    console.log(editMode)
 
     const productId = req.params.productId
-    Product.find(productId, product => {
-        console.log('editProduct', product)
+    Product.find(productId).then(([product]) => {
+        if (!product.length) {
+            return res.redirect('/')
+        }
         res.render('admin/edit-product', {
-            pageTitle: 'Add Product',
-            path: '/admin/add-product',
-            editMode: editMode,
-            product: product,
+            pageTitle: 'Edit Product',
+            path: '/admin/edit-product',
+            editMode,
+            product: product[0],
         })
     })
 }
@@ -33,8 +34,13 @@ exports.postAddProduct = (req, res, next) => {
     const price = req.body.price
     const description = req.body.description
     const product = new Product(null, title, imageUrl, description, price)
-    product.save()
-    res.redirect('/')
+
+    product
+        .save()
+        .then(() => {
+            res.redirect('/')
+        })
+        .catch(err => console.log(err))
 }
 
 exports.postEditProduct = (req, res, next) => {
@@ -51,14 +57,17 @@ exports.postEditProduct = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
     const id = req.body.productId
-    Product.deleteById(id)
-    res.redirect('/admin/products')
+    Product.delete(id)
+        .then(() => {
+            res.redirect('/admin/products')
+        })
+        .catch(err => console.log(err))
 }
 
 exports.getProducts = (req, res, next) => {
-    Product.fetchAll(products => {
+    Product.get().then(([rows, fieldData]) => {
         res.render('admin/products', {
-            prods: products,
+            prods: rows,
             pageTitle: 'Admin Products',
             path: '/admin/products',
         })
