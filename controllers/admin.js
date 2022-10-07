@@ -8,6 +8,26 @@ exports.getAddProduct = (req, res, next) => {
     })
 }
 
+exports.postAddProduct = (req, res, next) => {
+    const title = req.body.title
+    const imageUrl = req.body.imageUrl
+    const price = req.body.price
+    const description = req.body.description
+
+    req.user
+        .createProduct({
+            title,
+            price,
+            imageUrl,
+            description,
+        })
+        .then(() => {
+            console.log('CREATED PRODUCT')
+            res.redirect('/admin/products')
+        })
+        .catch(err => console.log(err))
+}
+
 exports.getEditProduct = (req, res, next) => {
     const editMode = req.query.edit
     if (!editMode) {
@@ -23,25 +43,6 @@ exports.getEditProduct = (req, res, next) => {
                 editMode,
                 product: product,
             })
-        })
-        .catch(err => console.log(err))
-}
-
-exports.postAddProduct = (req, res, next) => {
-    const title = req.body.title
-    const imageUrl = req.body.imageUrl
-    const price = req.body.price
-    const description = req.body.description
-
-    Product.create({
-        title,
-        price,
-        imageUrl,
-        description,
-    })
-        .then(() => {
-            console.log('CREATED PRODUCT')
-            res.redirect('/admin/products')
         })
         .catch(err => console.log(err))
 }
@@ -82,7 +83,8 @@ exports.postDeleteProduct = (req, res, next) => {
 }
 
 exports.getProducts = (req, res, next) => {
-    Product.findAll()
+    req.user
+        .getProducts()
         .then(products => {
             res.render('admin/products', {
                 prods: products,
