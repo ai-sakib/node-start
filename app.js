@@ -57,12 +57,17 @@ sequelize
     })
     .then(user => {
         if (!user) {
-            return User.create({ name: 'Max', email: 'max@gmail.cim' })
+            return User.create({ name: 'Sakib', email: 'sakib2439@gmail.com' })
         }
         return user
     })
     .then(user => {
-        return user.createCart()
+        user.getCart().then(cart => {
+            if (!cart) {
+                return user.createCart()
+            }
+            return cart
+        })
     })
     .then(cart => {
         app.listen(3000)
